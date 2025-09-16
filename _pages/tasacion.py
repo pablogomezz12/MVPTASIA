@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import folium
+from streamlit_folium import st_folium
 
 st.set_page_config(page_title="Tasación IA", layout="wide")
 # --------- Página principal (Home) ---------
@@ -95,6 +97,22 @@ with tab2:
     distrito = st.selectbox("Distrito", options=districts)
     latitude = st.number_input("Latitud", format="%.6f")
     longitude = st.number_input("Longitud", format="%.6f")
+    st.title("Mapa interactivo")
+
+    # Create base map
+    m = folium.Map(location=[39.4699, -0.3763], zoom_start=15)  # Madrid as default center
+
+    # Add click listener
+    m.add_child(folium.LatLngPopup())
+
+    # Render map
+    map_data = st_folium(m,use_container_width=True,  height=500)
+
+    # Get last clicked coordinates
+    if map_data and map_data["last_clicked"]:
+        lat = map_data["last_clicked"]["lat"]
+        lon = map_data["last_clicked"]["lng"]
+        st.success(f"Has hecho click en: Latitud={lat}, Longitud={lon}")
 with tab3:
     col1_anuncio, col2_anuncio = st.columns(2)
     with col1_anuncio:
