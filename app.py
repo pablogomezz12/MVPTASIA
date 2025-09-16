@@ -3,8 +3,7 @@ import streamlit as st
 # Initialize logged_in flag if it doesn't exist
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-else:
-    st.session_state.logged_in = False
+
 # Simple login function
 def login():
     st.title("Iniciar sesión")
@@ -24,7 +23,7 @@ if not st.session_state.logged_in:
 else:
     pages = {
         "": [
-            st.Page("pages/tasacion.py", title="Tasación IA"),
+            st.Page("_pages/tasacion.py", title="Tasación IA"),
         ]
     }
     pg = st.navigation(pages)
