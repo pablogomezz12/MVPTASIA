@@ -95,9 +95,8 @@ with tab2:
              'La Constitución - Canaleta', 'Zona Ausias March', 'Alboraya Centro', 'Cardenal Benlloch',
              'Zona Metro', 'Desconocido']
     distrito = st.selectbox("Distrito", options=districts)
-    latitude = st.number_input("Latitud", format="%.6f")
-    longitude = st.number_input("Longitud", format="%.6f")
-    st.title("Mapa interactivo")
+
+    st.title("Marque la ubicación aproximada en el mapa")
 
     # Create base map
     m = folium.Map(location=[39.4699, -0.3763], zoom_start=15)  # Madrid as default center
@@ -110,9 +109,9 @@ with tab2:
 
     # Get last clicked coordinates
     if map_data and map_data["last_clicked"]:
-        lat = map_data["last_clicked"]["lat"]
-        lon = map_data["last_clicked"]["lng"]
-        st.success(f"Has hecho click en: Latitud={lat}, Longitud={lon}")
+        latitude = map_data["last_clicked"]["lat"]
+        longitude = map_data["last_clicked"]["lng"]
+        st.success(f"Has hecho click en: Latitud={latitude}, Longitud={longitude}")
 with tab3:
     col1_anuncio, col2_anuncio = st.columns(2)
     with col1_anuncio:
@@ -163,7 +162,7 @@ if st.button("Predecir precio"):
             "piso_turistico": piso_turistico,"trastero": trastero,"zonas_comunes": zonas_coumnes,"accesible": accesible,
             "amueblado": amueblado,"numPhotos": n_fotos
         }
-
+        
         # Preprocesamiento
         df_modelo = preprocesar_inputs(input_dict)
 
