@@ -182,14 +182,37 @@ if st.button("Predecir precio"):
         diff_color = "red" if diff > 0 else "green"
 
         # Mostrar resultados
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
+
         with col1:
-            st.metric("Precio estimado", f"{pred:,.2f} €")
+            st.markdown(
+                f"""
+                <div style="background-color:#f0f2f6;
+                            border-radius:12px;
+                            padding:20px;
+                            text-align:center;
+                            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                    <h4 style="color:#333;">Precio estimado</h4>
+                    <h2 style="color:#0d6efd; font-size:32px;">{pred:,.2f} €</h2>
+                    <div style="font-size:18px; font-weight:bold; color:{diff_color};">
+                        diferencia: {diff_sign} {abs(diff):,.2f} €
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
         with col2:
-            st.metric(f"Precio medio en {distrito}", f"{mean_price:,.2f} €")
-        with col3:
-            st.metric(
-                label="Diferencia",
-                value=f"{pred-mean_price:,.2f} €",
-                delta=f"{diff:,.2f} €"
+            st.markdown(
+                f"""
+                <div style="background-color:#f0f2f6;
+                            border-radius:12px;
+                            padding:20px;
+                            text-align:center;
+                            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                    <h4 style="color:#333;">Precio medio en {distrito}</h4>
+                    <h2 style="color:#198754; font-size:32px;">{mean_price:,.2f} €</h2>
+                </div>
+                """,
+                unsafe_allow_html=True
             )
