@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 import folium
 from streamlit_folium import st_folium
-
+import requests
 st.set_page_config(page_title="AproxIA", page_icon="Aproxia.png", layout="wide")
 col1, col2 = st.columns([10, 2])  # proporción: mucho espacio a la izquierda
 with col2:
@@ -12,6 +12,71 @@ with col2:
 # Esta será la primera entrada del menú. Las demás páginas deben ir en la carpeta "pages".
 st.header("Estima el valor de tus inmuebles mediante IA")
 
+
+columnas_entrenamiento = [
+"numPhotos",
+"floor",
+"size",
+"exterior",
+"rooms",
+"bathrooms",
+"latitude",
+"longitude",
+"hasVideo",
+"newDevelopment",
+"hasLift",
+"hasPlan",
+"has3DTour",
+"has360",
+"hasStaging",
+"newDevelopmentFinished",
+"HasParking",
+"ParkingIncluded",
+"parkingSpacePrice",
+"contrato_alquiler",
+"ocupado",
+"piscina",
+"piso_turistico",
+"trastero",
+"zonas_comunes",
+"accesible",
+"amueblado",
+"is_floor_DP",
+"district_Alboraya Centro",
+"district_Algirós",
+"district_Barrio de la Luz",
+"district_Benicalap",
+"district_Benimaclet",
+"district_Camins al Grau",
+"district_Campanar",
+"district_Cardenal Benlloch",
+"district_Ciutat Vella",
+"district_DP",
+"district_El Pla del Real",
+"district_Extramurs",
+"district_Jesús",
+"district_L'Eixample",
+"district_L'Olivereta",
+"district_La Constitución - Canaleta",
+"district_La Saïdia",
+"district_Los Juzgados",
+"district_Patraix",
+"district_Poblats Marítims",
+"district_Quatre Carreres",
+"district_Rascanya",
+"district_Zona Ausias March",
+"district_Zona Metro",
+"status_DP",
+"status_good",
+"status_newdevelopment",
+"status_renew",
+"propertyType_chalet",
+"propertyType_countryHouse",
+"propertyType_duplex",
+"propertyType_flat",
+"propertyType_penthouse",
+"propertyType_studio",
+]
 
 mean_prices = {
     "Alboraya Centro": 233800.0, "Algirós": 344917.780822, "Barrio de la Luz": 152333.333333,
@@ -152,72 +217,71 @@ with tab5:
 
 if st.button("Predecir precio"):
     #st.success("¡Funcionalidad en desarrollo!")
-    try:
-        modelo, columnas_entrenamiento = joblib.load("modelo_xgb.joblib")
-    except Exception as e:
-        st.error(f"Error cargando modelo: {e}")
-    else:
-        # Construcción del diccionario con tus variables
-        input_dict = {
-            "size": tamaño_m2,"rooms": n_hab,"bathrooms": n_bath,"latitude": latitude,"longitude": longitude,
-            "parkingSpacePrice": precio_parking,"propertyType": propiedad,"status": estado_propiedad,"district": distrito,
-            "floor": planta_cat if planta_cat else num_plantas,"exterior": exterior,"hasVideo": video,"newDevelopment": promocion_nueva,
-            "hasLift": ascensor,"hasPlan": plano,"has3DTour": tour_3d,"has360": vista_360,"hasStaging": staging,"newDevelopmentFinished": promocion_termianda,
-            "HasParking": parking,"ParkingIncluded": parking_precio,"contrato_alquiler": tiene_contrato,"ocupado": ocupa,"piscina": piscina,
-            "piso_turistico": piso_turistico,"trastero": trastero,"zonas_comunes": zonas_coumnes,"accesible": accesible,
-            "amueblado": amueblado,"numPhotos": n_fotos
-        }
-        
-        # Preprocesamiento
-        df_modelo = preprocesar_inputs(input_dict)
+    
+    
+    # Construcción del diccionario con tus variables
+    input_dict = {
+        "size": tamaño_m2,"rooms": n_hab,"bathrooms": n_bath,"latitude": latitude,"longitude": longitude,
+        "parkingSpacePrice": precio_parking,"propertyType": propiedad,"status": estado_propiedad,"district": distrito,
+        "floor": planta_cat if planta_cat else num_plantas,"exterior": exterior,"hasVideo": video,"newDevelopment": promocion_nueva,
+        "hasLift": ascensor,"hasPlan": plano,"has3DTour": tour_3d,"has360": vista_360,"hasStaging": staging,"newDevelopmentFinished": promocion_termianda,
+        "HasParking": parking,"ParkingIncluded": parking_precio,"contrato_alquiler": tiene_contrato,"ocupado": ocupa,"piscina": piscina,
+        "piso_turistico": piso_turistico,"trastero": trastero,"zonas_comunes": zonas_coumnes,"accesible": accesible,
+        "amueblado": amueblado,"numPhotos": n_fotos
+    }
+    
+    # Preprocesamiento
+    df_modelo = preprocesar_inputs(input_dict)
 
-        # Asegurarse de que estén todas las columnas esperadas
-        for col in columnas_entrenamiento:
-            if col not in df_modelo.columns:
-                df_modelo[col] = 0
-        df_modelo = df_modelo[columnas_entrenamiento]
+    # Asegurarse de que estén todas las columnas esperadas
+    for col in columnas_entrenamiento:
+        if col not in df_modelo.columns:
+            df_modelo[col] = 0
+    df_modelo = df_modelo[columnas_entrenamiento]
+    df_dict = df_modelo.to_dict(orient="records")[0]
+    response = requests.post("https://41bf5f53024d.ngrok-free.app/modelpredict", json=df_dict)
+    
+    # Predicción
+    # pred = modelo.predict(df_modelo)[0]
+    pred = response.json().get("precio", 0)
+    # Comparación con el precio medio de la zona
+    mean_price = mean_prices.get(distrito, 0)
+    diff = pred - mean_price
+    diff_sign = "▲" if diff > 0 else "▼"
+    diff_color = "red" if diff > 0 else "green"
 
-        # Predicción
-        pred = modelo.predict(df_modelo)[0]
+    # Mostrar resultados
+    col1, col2 = st.columns(2)
 
-        # Comparación con el precio medio de la zona
-        mean_price = mean_prices.get(distrito, 0)
-        diff = pred - mean_price
-        diff_sign = "▲" if diff > 0 else "▼"
-        diff_color = "red" if diff > 0 else "green"
-
-        # Mostrar resultados
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.markdown(
-                f"""
-                <div style="background-color:#f0f2f6;
-                            border-radius:12px;
-                            padding:20px;
-                            text-align:center;
-                            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                    <h4 style="color:#333;">Precio estimado</h4>
-                    <h2 style="color:#0d6efd; font-size:32px;">{pred:,.2f} €</h2>
-                    <div style="font-size:18px; font-weight:bold; color:{diff_color};">
-                        diferencia: {diff_sign} {abs(diff):,.2f} €
-                    </div>
+    with col1:
+        st.markdown(
+            f"""
+            <div style="background-color:#f0f2f6;
+                        border-radius:12px;
+                        padding:20px;
+                        text-align:center;
+                        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                <h4 style="color:#333;">Precio estimado</h4>
+                <h2 style="color:#0d6efd; font-size:32px;">{pred:,.2f} €</h2>
+                <div style="font-size:18px; font-weight:bold; color:{diff_color};">
+                    diferencia: {diff_sign} {abs(diff):,.2f} €
                 </div>
-                """,
-                unsafe_allow_html=True
-            )
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-        with col2:
-            st.markdown(
-                f"""
-                <div style="background-color:#f0f2f6;
-                            border-radius:12px;
-                            padding:20px;
-                            text-align:center;
-                            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                    <h4 style="color:#333;">Precio medio en {distrito}</h4>
-                    <h2 style="color:#198754; font-size:32px;">{mean_price:,.2f} €</h2>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    with col2:
+        st.markdown(
+            f"""
+            <div style="background-color:#f0f2f6;
+                        border-radius:12px;
+                        padding:20px;
+                        text-align:center;
+                        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                <h4 style="color:#333;">Precio medio en {distrito}</h4>
+                <h2 style="color:#198754; font-size:32px;">{mean_price:,.2f} €</h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )

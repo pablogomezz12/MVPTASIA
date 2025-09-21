@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 
 # Initialize logged_in flag if it doesn't exist
 if "logged_in" not in st.session_state:
@@ -10,7 +11,9 @@ def login():
     username = st.text_input("Usuario")
     password = st.text_input("Contraseña", type="password")
     if st.button("Iniciar sesión"):
-        if username == "admin" and password == "1234":
+        payload = {"user": username, "password": password}
+        response = requests.post("https://41bf5f53024d.ngrok-free.app/login", json=payload)
+        if response.json().get("success") == True:
             st.session_state.logged_in = True
             st.rerun()
         else:
