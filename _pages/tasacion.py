@@ -264,7 +264,7 @@ if st.button("Predecir precio"):
                 <h4 style="color:#333;">Precio estimado</h4>
                 <h2 style="color:#0d6efd; font-size:32px;">{pred:,.2f} €</h2>
                 <div style="font-size:18px; font-weight:bold; color:{diff_color};">
-                    diferencia: {diff_sign} {abs(diff):,.2f} €
+                    Diferencia respecto a la media: {diff_sign} {abs(diff):,.2f} €
                 </div>
             </div>
             """,
