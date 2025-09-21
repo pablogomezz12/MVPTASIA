@@ -4,10 +4,13 @@ import joblib
 import folium
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="Tasación IA", layout="wide")
+st.set_page_config(page_title="AproxIA", page_icon="Aproxia.png", layout="wide")
+col1, col2 = st.columns([10, 2])  # proporción: mucho espacio a la izquierda
+with col2:
+    st.image("Aproxia.png", width=80)
 # --------- Página principal (Home) ---------
 # Esta será la primera entrada del menú. Las demás páginas deben ir en la carpeta "pages".
-st.header("Tasación de inmuebles mediante IA")
+st.header("Estima el valor de tus inmuebles mediante IA")
 
 
 mean_prices = {
@@ -64,9 +67,9 @@ with tab1:
     col1_db, col2_db = st.columns(2)
 
     with col1_db:
-        tamaño_m2 = st.number_input("Tamaño en (m^2)", min_value=1, value=1, step=1)
-        n_hab = st.number_input("Número de habitaciones", min_value=0, value=0, step=1)
-        n_bath = st.number_input("Número de baños", min_value=0, value=0, step=1)
+        tamaño_m2 = st.number_input("Tamaño en (m^2)", min_value=10, value=100, step=1)
+        n_hab = st.number_input("Número de habitaciones", min_value=0, value=1, step=1)
+        n_bath = st.number_input("Número de baños", min_value=1, value=1, step=1)
         ascensor = st.selectbox("Ascensor", options= boolean_opts)
     with col2_db:
         propiedad = st.selectbox("Tipo de propiedad", options= property_types)
@@ -115,7 +118,7 @@ with tab2:
 with tab3:
     col1_anuncio, col2_anuncio = st.columns(2)
     with col1_anuncio:
-        n_fotos = st.number_input("Número de fotos en anuncio", min_value=0, value=0, step=1)
+        n_fotos = st.number_input("Número de fotos en anuncio", min_value=0, value=1, step=1)
         plano = st.selectbox("Tiene plano", options= boolean_opts)
         video = st.selectbox("Tiene video", options= boolean_opts)
     with col2_anuncio:
@@ -126,8 +129,10 @@ with tab4:
     col1_parking, col2_parking = st.columns(2)
     with col1_parking:
         parking = st.selectbox("Tiene parking", options= boolean_opts)
-        parking_precio = st.selectbox("Parking incluido", options= boolean_opts)
-        precio_parking = st.number_input("Precio plaza de parking", format="%.2f")
+        parking_precio = st.selectbox("Parking incluido", options= boolean_opts, key= "parking_incluido")
+        precio_parking = st.number_input("Precio plaza de parking", format="%.2f", 
+                                         value=3.0 if parking_precio == "Verdadero" else 0.0, 
+                                         disabled= False if st.session_state.get("parking_incluido", 0) in ["Falso", "Desconocido"] else True, key="precio_parking")
     with col2_parking:
         piso_turistico = st.selectbox("Piso turístico", options= boolean_opts)
         tiene_contrato = st.selectbox("Tiene contrato de alquiler", options= boolean_opts)
@@ -137,12 +142,12 @@ with tab5:
     with col1_otros:
         promocion_nueva = st.selectbox("Nueva promoción", options= boolean_opts)
         promocion_termianda = st.selectbox("Promoción terminada", options= boolean_opts)
+        amueblado = st.selectbox("Está amueblado", options= boolean_opts)
         trastero = st.selectbox("Tiene trastero", options= boolean_opts)
     with col2_otros:
-        piscina = st.selectbox("Tiene piscina", options= boolean_opts)
-        zonas_coumnes = st.selectbox("Tiene zonas comunes", options= boolean_opts)
         accesible = st.selectbox("Es accesible", options= boolean_opts)
-        amueblado = st.selectbox("Está amueblado", options= boolean_opts)
+        zonas_coumnes = st.selectbox("Tiene zonas comunes", options= boolean_opts)
+        piscina = st.selectbox("Tiene piscina", options= boolean_opts)
 
 
 if st.button("Predecir precio"):
