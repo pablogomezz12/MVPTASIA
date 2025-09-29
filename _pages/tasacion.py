@@ -90,7 +90,7 @@ mean_prices = {
     "Zona Ausias March": 289666.666667, "Zona Metro": 164966.666667
 }
 
-property_types = ["Edificio", "Penthouse", "Duplex", "Chalet", "Estudio", "Casa de campo"]
+property_types = ["Piso", "Penthouse", "Duplex", "Chalet", "Estudio", "Casa de campo"]
 statuses = ["Bueno", "Reformado", "Desconocido", "Nueva promoción"]
 boolean_opts = ["Verdadero", "Falso", "Desconocido"]
 districts = list(mean_prices.keys()) + ["Desconocido"]
@@ -135,11 +135,11 @@ with tab1:
         tamaño_m2 = st.number_input("Tamaño en (m^2)", min_value=10, value=100, step=1)
         n_hab = st.number_input("Número de habitaciones", min_value=0, value=1, step=1)
         n_bath = st.number_input("Número de baños", min_value=1, value=1, step=1)
-        ascensor = st.selectbox("Ascensor", options= boolean_opts)
+        ascensor = st.selectbox("Ascensor", options= boolean_opts, index=2)
     with col2_db:
         propiedad = st.selectbox("Tipo de propiedad", options= property_types)
-        estado_propiedad = st.selectbox("Estado de la propiedad", options= statuses)
-        exterior = st.selectbox("Exterior", options= boolean_opts)
+        estado_propiedad = st.selectbox("Estado de la propiedad", options= statuses, index=2)
+        exterior = st.selectbox("Exterior", options= boolean_opts, index=2)
 
         # Añadir número de plantas y planta, deshabilitando uno si el otro tiene valor
         num_plantas = st.number_input(
@@ -156,18 +156,23 @@ with tab1:
             disabled=False if st.session_state.get("num_plantas", 0) == 0 else True,
             key="planta"
         )
+        with st.expander("Más información sobre el modelo"):
+            st.write("""
+                Aquí puedes poner texto, tablas, gráficos o lo que quieras.
+                Todo queda dentro del desplegable.
+            """)
 with tab2:
     districts = ['Ciutat Vella', 'Extramurs', 'El Pla del Real', "L'Eixample", 'Camins al Grau', 'Benicalap',
              'Patraix', 'Quatre Carreres', 'Rascanya', 'Poblats Marítims', 'Campanar', 'Benimaclet',
              "L'Olivereta", 'Jesús', 'Algirós', 'Barrio de la Luz', 'La Saïdia', 'Los Juzgados',
              'La Constitución - Canaleta', 'Zona Ausias March', 'Alboraya Centro', 'Cardenal Benlloch',
              'Zona Metro', 'Desconocido']
-    distrito = st.selectbox("Distrito", options=districts)
+    distrito = st.selectbox("Distrito", options= sorted(districts))
 
     st.title("Marque la ubicación aproximada en el mapa")
 
     # Create base map
-    m = folium.Map(location=[39.4699, -0.3763], zoom_start=15)  # Madrid as default center
+    m = folium.Map(location=[39.4699, -0.3763], zoom_start=15)  
 
     # Add click listener
     m.add_child(folium.LatLngPopup())
@@ -183,36 +188,36 @@ with tab2:
 with tab3:
     col1_anuncio, col2_anuncio = st.columns(2)
     with col1_anuncio:
-        n_fotos = st.number_input("Número de fotos en anuncio", min_value=0, value=1, step=1)
-        plano = st.selectbox("Tiene plano", options= boolean_opts)
-        video = st.selectbox("Tiene video", options= boolean_opts)
+        n_fotos = st.number_input("Número de fotos en anuncio", min_value=0, value=10, step=1)
+        plano = st.selectbox("Tiene plano", options= boolean_opts, index=2)
+        video = st.selectbox("Tiene video", options= boolean_opts, index=2)
     with col2_anuncio:
-        tour_3d = st.selectbox("Tiene tour 3D", options= boolean_opts)
-        vista_360 = st.selectbox("Tiene vista 360º", options= boolean_opts)
-        staging = st.selectbox("Tiene staging", options= boolean_opts)
+        tour_3d = st.selectbox("Tiene tour 3D", options= boolean_opts, index=2)
+        vista_360 = st.selectbox("Tiene vista 360º", options= boolean_opts, index=2)
+        staging = st.selectbox("Tiene staging", options= boolean_opts, index=2)
 with tab4:
     col1_parking, col2_parking = st.columns(2)
     with col1_parking:
-        parking = st.selectbox("Tiene parking", options= boolean_opts)
-        parking_precio = st.selectbox("Parking incluido", options= boolean_opts, key= "parking_incluido")
+        parking = st.selectbox("Tiene parking", options= boolean_opts, index=2)
+        parking_precio = st.selectbox("Parking incluido", options= boolean_opts, index=2, key= "parking_incluido")
         precio_parking = st.number_input("Precio plaza de parking", format="%.2f", 
                                          value=3.0 if parking_precio == "Verdadero" else 0.0, 
                                          disabled= False if st.session_state.get("parking_incluido", 0) in ["Falso", "Desconocido"] else True, key="precio_parking")
     with col2_parking:
-        piso_turistico = st.selectbox("Piso turístico", options= boolean_opts)
-        tiene_contrato = st.selectbox("Tiene contrato de alquiler", options= boolean_opts)
-        ocupa = st.selectbox("Está ocupado", options= boolean_opts)
+        piso_turistico = st.selectbox("Piso turístico", options= boolean_opts, index=2)
+        tiene_contrato = st.selectbox("Tiene contrato de alquiler", options= boolean_opts, index=2)
+        ocupa = st.selectbox("Está ocupado", options= boolean_opts, index=2)
 with tab5:
     col1_otros, col2_otros = st.columns(2)
     with col1_otros:
-        promocion_nueva = st.selectbox("Nueva promoción", options= boolean_opts)
-        promocion_termianda = st.selectbox("Promoción terminada", options= boolean_opts)
-        amueblado = st.selectbox("Está amueblado", options= boolean_opts)
-        trastero = st.selectbox("Tiene trastero", options= boolean_opts)
+        promocion_nueva = st.selectbox("Nueva promoción", options= boolean_opts, index=2)
+        promocion_termianda = st.selectbox("Promoción terminada", options= boolean_opts, index=2)
+        amueblado = st.selectbox("Está amueblado", options= boolean_opts, index=2)
+        trastero = st.selectbox("Tiene trastero", options= boolean_opts, index=2)
     with col2_otros:
-        accesible = st.selectbox("Es accesible", options= boolean_opts)
-        zonas_coumnes = st.selectbox("Tiene zonas comunes", options= boolean_opts)
-        piscina = st.selectbox("Tiene piscina", options= boolean_opts)
+        accesible = st.selectbox("Es accesible", options= boolean_opts, index=2)
+        zonas_coumnes = st.selectbox("Tiene zonas comunes", options= boolean_opts, index=2)
+        piscina = st.selectbox("Tiene piscina", options= boolean_opts, index=2)
 
 
 if st.button("Predecir precio"):
