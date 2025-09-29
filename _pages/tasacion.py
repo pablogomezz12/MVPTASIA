@@ -239,7 +239,7 @@ if st.button("Predecir precio"):
             df_modelo[col] = 0
     df_modelo = df_modelo[columnas_entrenamiento]
     df_dict = df_modelo.to_dict(orient="records")[0]
-    response = requests.post("https://41bf5f53024d.ngrok-free.app/modelpredict", json=df_dict)
+    response = requests.post("https://4594e0bb4895.ngrok-free.app/modelpredict", json=df_dict)
     
     # Predicción
     # pred = modelo.predict(df_modelo)[0]
