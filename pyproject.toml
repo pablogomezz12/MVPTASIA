@@ -7,6 +7,9 @@ requires-python = ">=3.13"
 dependencies = [
     "folium>=0.20.0",
     "joblib>=1.5.2",
+    "plotly>=6.3.1",
+    "pymysql>=1.1.2",
+    "sqlalchemy>=2.0.43",
     "streamlit>=1.49.1",
     "streamlit-folium>=0.25.1",
     "xgboost>=3.0.5",
