@@ -27,6 +27,7 @@ else:
     pages = {
         "": [
             st.Page("_pages/tasacion.py", title="Tasación IA"),
+            st.Page("_pages/tendencias.py", title="Tendencias"),
         ]
     }
     pg = st.navigation(pages)
