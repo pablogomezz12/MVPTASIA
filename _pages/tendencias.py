@@ -2,33 +2,30 @@ import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
 import plotly.express as px
+import requests
 
-# --- DATABASE CONFIG ---
-DATABASE_URL = "mysql+pymysql://root:rootpassword@localhost:3306/mydatabase"
+url = "http://localhost:8000/query"
 
-# --- PAGE CONFIG ---
-st.set_page_config(
-    page_title="District Statistics",
-    page_icon="🏙️",
-    layout="wide"
-)
+
+payload = {
+    "query": "SELECT * FROM PropertiesClean"
+}
+
+
+response = requests.post(url, json=payload)
+
+
+response.raise_for_status()
+
+data = response.json()
+df = pd.DataFrame(data)
+
+
+print(df.head())
+
 
 st.title("🏙️ District Price Statistics Dashboard")
 
-# --- CONNECT TO DATABASE ---
-@st.cache_data
-def load_data():
-    engine = create_engine(DATABASE_URL)
-    query = "SELECT * FROM Districts_mean;"
-    df = pd.read_sql(query, con=engine)
-    return df
-
-# --- LOAD DATA ---
-try:
-    df = load_data()
-except Exception as e:
-    st.error(f"Error loading data: {e}")
-    st.stop()
 
 # --- SIDEBAR FILTERS ---
 districts = df['district'].sort_values().unique()
