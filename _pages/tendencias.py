@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 import plotly.express as px
 import requests
 
-url = "http://localhost:8000/query"
+url = "https://4594e0bb4895.ngrok-free.app/query"
 
 
 payload = {
