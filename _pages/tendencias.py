@@ -8,7 +8,7 @@ url = "https://4594e0bb4895.ngrok-free.app/query"
 
 
 payload = {
-    "query": "SELECT * FROM PropertiesClean"
+    "query": "SELECT * FROM Districts_mean"
 }
 
 
