@@ -62,6 +62,7 @@ columnas_entrenamiento = [
 "district_Los Juzgados",
 "district_Patraix",
 "district_Poblats Marítims",
+"district_Pobles del Sud",
 "district_Quatre Carreres",
 "district_Rascanya",
 "district_Zona Ausias March",
@@ -86,7 +87,7 @@ mean_prices = {
     "Jesús": 253030.786164, "L'Eixample": 534020.52, "L'Olivereta": 188714.89404,
     "La Constitución - Canaleta": 215605.555556, "La Saïdia": 281952.537037,
     "Los Juzgados": 255125.0, "Patraix": 275937.655844, "Poblats Marítims": 299262.189873,
-    "Quatre Carreres": 373587.863454, "Rascanya": 183224.910615,
+    'Pobles del Sud': 0, "Quatre Carreres": 373587.863454, "Rascanya": 183224.910615,
     "Zona Ausias March": 289666.666667, "Zona Metro": 164966.666667
 }
 
@@ -163,7 +164,7 @@ with tab1:
             """)
 with tab2:
     districts = ['Ciutat Vella', 'Extramurs', 'El Pla del Real', "L'Eixample", 'Camins al Grau', 'Benicalap',
-             'Patraix', 'Quatre Carreres', 'Rascanya', 'Poblats Marítims', 'Campanar', 'Benimaclet',
+             'Patraix', 'Quatre Carreres', 'Rascanya', 'Poblats Marítims','Pobles del Sud', 'Campanar', 'Benimaclet',
              "L'Olivereta", 'Jesús', 'Algirós', 'Barrio de la Luz', 'La Saïdia', 'Los Juzgados',
              'La Constitución - Canaleta', 'Zona Ausias March', 'Alboraya Centro', 'Cardenal Benlloch',
              'Zona Metro', 'Desconocido']
