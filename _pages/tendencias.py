@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 import plotly.express as px
 import requests
 
-url = "https://4594e0bb4895.ngrok-free.app/query"
+url = "https://82ddf5320a83.ngrok-free.app/query"
 
 
 payload = {
@@ -21,69 +21,78 @@ data = response.json()
 df = pd.DataFrame(data)
 
 
-st.title("🏙️ District Price Statistics Dashboard")
+
+import streamlit as st
 
 # Datos de ejemplo
 num_operations_last_month = 123
 num_operations_last_month_2 = 456
 
-# Estilo CSS para los cuadros
+
+# Crear dos columnas lado a lado
+col1, col2 = st.columns(2)
+
+# Estilo CSS para los "cards"
 st.markdown("""
     <style>
-        .container {
-            display: flex;
-            justify-content: space-between;  /* Espacio entre los cuadros */
-            margin-bottom: 30px;
-        }
-        .card {
-            width: 48%;  /* Los cuadros ocupan el 48% de ancho de la pantalla */
-            padding: 40px;
+        .metric-card {
+            background-color: #262730;
             border-radius: 15px;
-            color: white;
+            padding: 25px;
             text-align: center;
-            font-size: 28px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            color: white;
         }
-        .card1 {
-            background-color: #4CAF50;  /* Verde para el primer cuadro */
+        .metric-title {
+            font-size: 22px;
+            font-weight: 500;
+            color: white;
         }
-        .card2 {
-            background-color: #FF5722;  /* Naranja para el segundo cuadro */
-        }
-        .title {
-            font-size: 36px;
+        .metric-value {
+            font-size: 48px;
             font-weight: bold;
+            margin-top: 10px;
         }
-        .value {
-            font-size: 60px;
-            font-weight: bold;
+        .green {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+        }
+        .orange {
+            background: linear-gradient(135deg, #FF5722, #FF7043);
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Contenedor para alinear los cuadros en la misma fila
-st.markdown("""
-    <div class="container">
-""", unsafe_allow_html=True)
+# KPI 1
+with col1:
+    st.markdown(f"""
+        <div class="metric-card green">
+            <div class="metric-title">
+                Operaciones en el último mes
+            </div>
+            <div class="metric-value">{num_operations_last_month}</div>
+        </div>
+    """, unsafe_allow_html=True)
+    # with st.popover("ℹ️ Info"):
+    #     st.markdown("""
+    #     **Operaciones en el último mes:**  
+    #     Número total de operaciones registradas durante los últimos 30 días.
+    #     """)
 
-# Cuadro 1: Operaciones último mes
-st.markdown(f"""
-    <div class="card card1">
-        <div class="title">Operaciones en el último mes</div>
-        <div class="value">{num_operations_last_month}</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# Cuadro 2: Operaciones del mes anterior
-st.markdown(f"""
-    <div class="card card2">
-        <div class="title">Operaciones del mes anterior</div>
-        <div class="value">{num_operations_last_month_2}</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# Cerrar el contenedor
-st.markdown("</div>", unsafe_allow_html=True)
-
+# KPI 2
+with col2:
+    st.markdown(f"""
+        <div class="metric-card orange">
+            <div class="metric-title">
+                Operaciones del mes anterior
+            </div>
+            <div class="metric-value">{num_operations_last_month_2}</div>
+        </div>
+    """, unsafe_allow_html=True)
+    # with st.popover("ℹ️ Info"):
+    #     st.markdown("""
+    #     **Operaciones del mes anterior:**  
+    #     Total de operaciones contabilizadas en el mes anterior al actual.
+    #     """)
 
 
 
