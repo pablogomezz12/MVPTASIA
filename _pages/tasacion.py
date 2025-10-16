@@ -12,7 +12,7 @@ with col2:
 # Esta será la primera entrada del menú. Las demás páginas deben ir en la carpeta "pages".
 st.header("Estima el valor de tus inmuebles mediante IA")
 
-
+url = "https://82ddf5320a83.ngrok-free.app/query"
 columnas_entrenamiento = [
 "numPhotos",
 "floor",
@@ -79,17 +79,31 @@ columnas_entrenamiento = [
 "propertyType_studio",
 ]
 
-mean_prices = {
-    "Alboraya Centro": 233800.0, "Algirós": 344917.780822, "Barrio de la Luz": 152333.333333,
-    "Benicalap": 267405.30303, "Benimaclet": 357065.625, "Camins al Grau": 355594.771144,
-    "Campanar": 421721.0, "Cardenal Benlloch": 186450.0, "Ciutat Vella": 471826.338843,
-    "DP": 154875.0, "El Pla del Real": 501607.843137, "Extramurs": 440052.671296,
-    "Jesús": 253030.786164, "L'Eixample": 534020.52, "L'Olivereta": 188714.89404,
-    "La Constitución - Canaleta": 215605.555556, "La Saïdia": 281952.537037,
-    "Los Juzgados": 255125.0, "Patraix": 275937.655844, "Poblats Marítims": 299262.189873,
-    'Pobles del Sud': 0, "Quatre Carreres": 373587.863454, "Rascanya": 183224.910615,
-    "Zona Ausias March": 289666.666667, "Zona Metro": 164966.666667
+payload = {
+    "query": f"""SELECT district,`avg(price)` FROM APROXIA_DB.`Districts_mean` """
 }
+
+
+response = requests.post(url, json=payload)
+
+
+response.raise_for_status()
+
+data = response.json()
+df = pd.DataFrame(data)
+# Assuming 'df' is already defined, and it has two columns: 'Neighborhood' and 'MeanPrice'
+mean_prices = dict(zip(df['district'], df['avg(price)']))
+# mean_prices = {
+#     "Alboraya Centro": 233800.0, "Algirós": 344917.780822, "Barrio de la Luz": 152333.333333,
+#     "Benicalap": 267405.30303, "Benimaclet": 357065.625, "Camins al Grau": 355594.771144,
+#     "Campanar": 421721.0, "Cardenal Benlloch": 186450.0, "Ciutat Vella": 471826.338843,
+#     "DP": 154875.0, "El Pla del Real": 501607.843137, "Extramurs": 440052.671296,
+#     "Jesús": 253030.786164, "L'Eixample": 534020.52, "L'Olivereta": 188714.89404,
+#     "La Constitución - Canaleta": 215605.555556, "La Saïdia": 281952.537037,
+#     "Los Juzgados": 255125.0, "Patraix": 275937.655844, "Poblats Marítims": 299262.189873,
+#     'Pobles del Sud': 0, "Quatre Carreres": 373587.863454, "Rascanya": 183224.910615,
+#     "Zona Ausias March": 289666.666667, "Zona Metro": 164966.666667
+# }
 
 property_types = ["Piso", "Penthouse", "Duplex", "Chalet", "Estudio", "Casa de campo"]
 statuses = ["Bueno", "Reformado", "Desconocido", "Nueva promoción"]
