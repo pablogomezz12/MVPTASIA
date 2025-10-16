@@ -67,7 +67,7 @@ with col1:
     st.markdown(f"""
         <div class="metric-card green">
             <div class="metric-title">
-                Operaciones en el último mes
+                Operaciones en el último mes del barrio seleccionado 
             </div>
             <div class="metric-value">{num_operations_last_month}</div>
         </div>
@@ -83,7 +83,7 @@ with col2:
     st.markdown(f"""
         <div class="metric-card orange">
             <div class="metric-title">
-                Operaciones del mes anterior
+                Operaciones del mes anterior del barrio con más movimiento
             </div>
             <div class="metric-value">{num_operations_last_month_2}</div>
         </div>
