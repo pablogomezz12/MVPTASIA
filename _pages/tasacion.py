@@ -171,11 +171,7 @@ with tab1:
             disabled=False if st.session_state.get("num_plantas", 0) == 0 else True,
             key="planta"
         )
-        with st.expander("Más información sobre el modelo"):
-            st.write("""
-                Aquí puedes poner texto, tablas, gráficos o lo que quieras.
-                Todo queda dentro del desplegable.
-            """)
+
 with tab2:
     districts = ['Ciutat Vella', 'Extramurs', 'El Pla del Real', "L'Eixample", 'Camins al Grau', 'Benicalap',
              'Patraix', 'Quatre Carreres', 'Rascanya', 'Poblats Marítims','Pobles del Sud', 'Campanar', 'Benimaclet',
@@ -185,6 +181,9 @@ with tab2:
     distrito = st.selectbox("Distrito", options= sorted(districts))
 
     st.title("Marque la ubicación aproximada en el mapa")
+    # --- Inicializar variables ANTES del mapa ---
+    latitude = None
+    longitude = None
 
     # Create base map
     m = folium.Map(location=[39.4699, -0.3763], zoom_start=15)  
@@ -199,7 +198,12 @@ with tab2:
     if map_data and map_data["last_clicked"]:
         latitude = map_data["last_clicked"]["lat"]
         longitude = map_data["last_clicked"]["lng"]
-        st.success(f"Has hecho click en: Latitud={latitude}, Longitud={longitude}")
+
+        if latitude is not None and longitude is not None:
+            st.success(f"Has hecho click en: Latitud={latitude}, Longitud={longitude}")
+    else:
+        st.warning("Haz clic en el mapa para seleccionar una ubicación.")
+
 with tab3:
     col1_anuncio, col2_anuncio = st.columns(2)
     with col1_anuncio:
@@ -234,74 +238,82 @@ with tab5:
         zonas_coumnes = st.selectbox("Tiene zonas comunes", options= boolean_opts, index=2)
         piscina = st.selectbox("Tiene piscina", options= boolean_opts, index=2)
 
+        with st.expander("Información IMPORTANTE sobre las variables."):
+            st.write("""
+                Hay variables que están bajo desarrollo y por tanto no tendrán
+                un impacto tan grande sobre el precio estimado como el que cabría 
+                esperar. Estas variables son marcadas con un *
+            """)
 
 if st.button("Predecir precio"):
     #st.success("¡Funcionalidad en desarrollo!")
     
-    
-    # Construcción del diccionario con tus variables
-    input_dict = {
-        "size": tamaño_m2,"rooms": n_hab,"bathrooms": n_bath,"latitude": latitude,"longitude": longitude,
-        "parkingSpacePrice": precio_parking,"propertyType": propiedad,"status": estado_propiedad,"district": distrito,
-        "floor": planta_cat if planta_cat else num_plantas,"exterior": exterior,"hasVideo": video,"newDevelopment": promocion_nueva,
-        "hasLift": ascensor,"hasPlan": plano,"has3DTour": tour_3d,"has360": vista_360,"hasStaging": staging,"newDevelopmentFinished": promocion_termianda,
-        "HasParking": parking,"ParkingIncluded": parking_precio,"contrato_alquiler": tiene_contrato,"ocupado": ocupa,"piscina": piscina,
-        "piso_turistico": piso_turistico,"trastero": trastero,"zonas_comunes": zonas_coumnes,"accesible": accesible,
-        "amueblado": amueblado,"numPhotos": n_fotos
-    }
-    
-    # Preprocesamiento
-    df_modelo = preprocesar_inputs(input_dict)
+    if latitude is None or longitude is None:
+        st.error("⚠️ Debes seleccionar una ubicación en el mapa antes de predecir el precio.")
+    else:
+        # Construcción del diccionario con tus variables
+        input_dict = {
+            "size": tamaño_m2,"rooms": n_hab,"bathrooms": n_bath,"latitude": latitude,"longitude": longitude,
+            "parkingSpacePrice": precio_parking,"propertyType": propiedad,"status": estado_propiedad,"district": distrito,
+            "floor": planta_cat if planta_cat else num_plantas,"exterior": exterior,"hasVideo": video,"newDevelopment": promocion_nueva,
+            "hasLift": ascensor,"hasPlan": plano,"has3DTour": tour_3d,"has360": vista_360,"hasStaging": staging,"newDevelopmentFinished": promocion_termianda,
+            "HasParking": parking,"ParkingIncluded": parking_precio,"contrato_alquiler": tiene_contrato,"ocupado": ocupa,"piscina": piscina,
+            "piso_turistico": piso_turistico,"trastero": trastero,"zonas_comunes": zonas_coumnes,"accesible": accesible,
+            "amueblado": amueblado,"numPhotos": n_fotos
+        }
+        
+        # Preprocesamiento
+        df_modelo = preprocesar_inputs(input_dict)
 
-    # Asegurarse de que estén todas las columnas esperadas
-    for col in columnas_entrenamiento:
-        if col not in df_modelo.columns:
-            df_modelo[col] = 0
-    df_modelo = df_modelo[columnas_entrenamiento]
-    df_dict = df_modelo.to_dict(orient="records")[0]
-    response = requests.post("https://82ddf5320a83.ngrok-free.app/modelpredict", json=df_dict)
-    
-    # Predicción
-    # pred = modelo.predict(df_modelo)[0]
-    pred = response.json().get("precio", 0)
-    # Comparación con el precio medio de la zona
-    mean_price = mean_prices.get(distrito, 0)
-    diff = pred - mean_price
-    diff_sign = "▲" if diff > 0 else "▼"
-    diff_color = "red" if diff > 0 else "green"
+        # Asegurarse de que estén todas las columnas esperadas
+        for col in columnas_entrenamiento:
+            if col not in df_modelo.columns:
+                df_modelo[col] = 0
+        df_modelo = df_modelo[columnas_entrenamiento]
+        df_dict = df_modelo.to_dict(orient="records")[0]
+        response = requests.post("https://82ddf5320a83.ngrok-free.app/modelpredict", json=df_dict)
+        
+        # Predicción
+        # pred = modelo.predict(df_modelo)[0]
+        pred = response.json().get("precio", 0)
+        # Comparación con el precio medio de la zona
+        mean_price = mean_prices.get(distrito, 0)
+        diff = pred - mean_price
+        diff_sign = "▲" if diff > 0 else "▼"
+        diff_color = "red" if diff > 0 else "green"
 
-    # Mostrar resultados
-    col1, col2 = st.columns(2)
+        # Mostrar resultados
+        col1, col2 = st.columns(2)
 
-    with col1:
-        st.markdown(
-            f"""
-            <div style="background-color:#f0f2f6;
-                        border-radius:12px;
-                        padding:20px;
-                        text-align:center;
-                        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                <h4 style="color:#333;">Precio estimado</h4>
-                <h2 style="color:#0d6efd; font-size:32px;">{pred:,.2f} €</h2>
-                <div style="font-size:18px; font-weight:bold; color:{diff_color};">
-                    Diferencia respecto a la media: {diff_sign} {abs(diff):,.2f} €
+        with col1:
+            st.markdown(
+                f"""
+                <div style="background-color:#f0f2f6;
+                            border-radius:12px;
+                            padding:20px;
+                            text-align:center;
+                            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                    <h4 style="color:#333;">Precio estimado</h4>
+                    <h2 style="color:#0d6efd; font-size:32px;">{pred:,.2f} €</h2>
+                    <div style="font-size:18px; font-weight:bold; color:{diff_color};">
+                        Diferencia respecto a la media: {diff_sign} {abs(diff):,.2f} €
+                    </div>
                 </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                """,
+                unsafe_allow_html=True
+            )
 
-    with col2:
-        st.markdown(
-            f"""
-            <div style="background-color:#f0f2f6;
-                        border-radius:12px;
-                        padding:20px;
-                        text-align:center;
-                        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                <h4 style="color:#333;">Precio medio en {distrito}</h4>
-                <h2 style="color:#198754; font-size:32px;">{mean_price:,.2f} €</h2>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        with col2:
+            st.markdown(
+                f"""
+                <div style="background-color:#f0f2f6;
+                            border-radius:12px;
+                            padding:20px;
+                            text-align:center;
+                            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                    <h4 style="color:#333;">Precio medio en {distrito}</h4>
+                    <h2 style="color:#198754; font-size:32px;">{mean_price:,.2f} €</h2>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
