@@ -223,20 +223,20 @@ with tab4:
                                          value=3.0 if parking_precio == "Verdadero" else 0.0, 
                                          disabled= False if st.session_state.get("parking_incluido", 0) in ["Falso", "Desconocido"] else True, key="precio_parking")
     with col2_parking:
-        piso_turistico = st.selectbox("Piso turístico", options= boolean_opts, index=2)
-        tiene_contrato = st.selectbox("Tiene contrato de alquiler", options= boolean_opts, index=2)
-        ocupa = st.selectbox("Está ocupado", options= boolean_opts, index=2)
+        piso_turistico = st.selectbox("*Piso turístico", options= boolean_opts, index=2)
+        tiene_contrato = st.selectbox("*Tiene contrato de alquiler", options= boolean_opts, index=2)
+        ocupa = st.selectbox("*Está ocupado", options= boolean_opts, index=2)
 with tab5:
     col1_otros, col2_otros = st.columns(2)
     with col1_otros:
         promocion_nueva = st.selectbox("Nueva promoción", options= boolean_opts, index=2)
         promocion_termianda = st.selectbox("Promoción terminada", options= boolean_opts, index=2)
-        amueblado = st.selectbox("Está amueblado", options= boolean_opts, index=2)
-        trastero = st.selectbox("Tiene trastero", options= boolean_opts, index=2)
+        amueblado = st.selectbox("*Está amueblado", options= boolean_opts, index=2)
+        trastero = st.selectbox("*Tiene trastero", options= boolean_opts, index=2)
     with col2_otros:
-        accesible = st.selectbox("Es accesible", options= boolean_opts, index=2)
-        zonas_coumnes = st.selectbox("Tiene zonas comunes", options= boolean_opts, index=2)
-        piscina = st.selectbox("Tiene piscina", options= boolean_opts, index=2)
+        accesible = st.selectbox("*Es accesible", options= boolean_opts, index=2)
+        zonas_coumnes = st.selectbox("*Tiene zonas comunes", options= boolean_opts, index=2)
+        piscina = st.selectbox("*Tiene piscina", options= boolean_opts, index=2)
 
         with st.expander("Información IMPORTANTE sobre las variables."):
             st.write("""
