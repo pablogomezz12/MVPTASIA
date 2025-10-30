@@ -12,7 +12,7 @@ with col2:
 # Esta será la primera entrada del menú. Las demás páginas deben ir en la carpeta "pages".
 st.header("Estima el valor de tus inmuebles mediante IA")
 
-url = "https://82ddf5320a83.ngrok-free.app/query"
+url = "https://dfcb4fa51fc2.ngrok-free.app/query"
 columnas_entrenamiento = [
 "numPhotos",
 "floor",
@@ -271,7 +271,7 @@ if st.button("Predecir precio"):
                 df_modelo[col] = 0
         df_modelo = df_modelo[columnas_entrenamiento]
         df_dict = df_modelo.to_dict(orient="records")[0]
-        response = requests.post("https://82ddf5320a83.ngrok-free.app/modelpredict", json=df_dict)
+        response = requests.post("https://dfcb4fa51fc2.ngrok-free.app/modelpredict", json=df_dict)
         
         # Predicción
         # pred = modelo.predict(df_modelo)[0]
